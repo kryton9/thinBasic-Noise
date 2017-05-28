@@ -1,0 +1,89 @@
+'NoiseDemo by kryton9
+'thanks to Petr for the base noise canvas code
+
+Uses "UI", "TBGL" ', "Console"
+
+#INCLUDE "Noise.tbasici"
+
+'id numbers of controls
+Begin ControlID
+    %lCanvas    
+    %myTimer 
+End ControlID
+
+Begin Const    
+    %timeOut = 32   'should be near 30 fps, try 16 for 60 fps
+End Const        
+
+DWord noiseData = TBGL_GBufferCreate(%TBGL_POINTS, %TBGL_2D)
+
+Function TBMain() 
+   DWord hDlg
+
+    Long winWidth = 512
+    Long winHeight = 512  
+        
+    Long  arraySize = winWidth * winHeight 
+    
+    Dim points(arraySize) As TBGL_TVECTOR2F
+    Dim colors(arraySize) As TBGL_TRGB  
+    
+    ' give a seed value to the random generator used by noise
+    SeedNoise(2017) 
+    
+    ' parameters: (scale, width, height, points array, color array, alpha, beta, n) 
+    ' scale > 0 and < 1   0.01 is a good start
+    ' alpha start With 2, then <2 rougher, >2 smoother 
+    ' beta start with 2, <2 zooms in and harsher, >2 zooms out and adds to the noise
+    ' n is either 1, 2, 3 or 4 it is the number of layers of detail, lower is bigger detail 
+    ' n > 4 should make no noticeable difference
+    FillNoiseArray( 0.01, winWidth, winHeight, points(1), colors(1), 2.0, 2.0, 4 ) 
+   
+    TBGL_GBufferDefineFromArray(noiseData, %TBGL_STATIC, arraySize, points, colors)  
+    
+    Dialog New Pixels, 0, "Noise Demo Canvas Using FillNoiseArray()",-1,-1, winWidth, winHeight, %WS_OVERLAPPEDWINDOW To hDlg
+    
+    Control Add Label, hDlg, %lCanvas, "", 0, 0, winWidth, winHeight
+    Control Set Color  hDlg, %lCanvas, %BLACK, %BLACK
+    Control Set Resize hDlg, %lCanvas, 1, 0, 1, 0
+   
+    Dialog Set Minsize hDlg, 128, 128
+    Dialog Show Modal hDlg, Call dlgCallback      
+End Function   
+ 
+ 
+CallBack Function dlgCallback()
+  Static hCtrl As DWord    
+    Select Case CBMSG 
+      
+        Case %WM_INITDIALOG
+            Dialog Set Timer CBHNDL, %myTimer, %timeOut, %NULL
+            Control Handle CBHNDL, %lCanvas To hCtrl       
+ 
+            TBGL_BindCanvas(hCtrl)
+        
+        Case %WM_SIZE, %WM_SIZING
+            TBGL_UpdateCanvasProportions(hCtrl)
+            RenderCanvas(hCtrl)
+        
+        Case %WM_TIMER
+            RenderCanvas(hCtrl)
+        
+        Case %WM_CLOSE 
+            TBGL_ReleaseCanvas(hCtrl)      
+            Dialog Kill Timer CBHNDL, %myTimer
+        
+        Case %WM_COMMAND
+   
+    End Select
+End Function
+
+
+Function RenderCanvas( hCtrl As DWord )             
+        TBGL_RenderMatrix2D
+        TBGL_ClearFrame         
+            TBGL_GBufferRender(noiseData)        
+        TBGL_DrawFrame     
+End Function
+
+

@@ -1,0 +1,21 @@
+' noise.tbasici by kryton9 
+' wrote and compiled this dll in C using Mingw32 and CodeBlocks IDE 
+' using c99 standards
+
+' code based on information and sources from:
+' http://paulbourke.net/texture_colour/perlin/ 
+
+' the following notes apply to all below:
+' alpha and beta start with 2 , lower alpha rougher results, higher alpha smoother results, 
+' beta is usually In a power of 1, 2, 4
+' n is no more than 4 (1, 2, 3, 4) 
+'scale should be > 0 and < 1                 
+
+Declare Function SeedNoise Lib "Noise"  Alias "SeedNoise"(ByVal seed As UInt32)
+                                                                     
+Declare Function Noise Lib "Noise"  Alias "Noise"(ByVal scale As Single, ByVal x As Single, ByVal y As Single, ByVal alpha As Single, _
+                                                                     ByVal beta As Single, ByVal n As Long)  As Single
+ 
+                                                                           
+Declare Function FillNoiseArray Lib "Noise"  Alias "FillNoiseArray"(ByVal scale As Single, ByVal width As Single, ByVal height As Single, ByRef points As TBGL_TVECTOR2F, ByRef colors As TBGL_TRGB, _
+                                                                         ByVal alpha As Single, ByVal beta As Single,  ByVal n As Long)
