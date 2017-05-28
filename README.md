@@ -18,4 +18,4 @@ Based on information from http://paulbourke.net/texture_colour/perlin/
   
 **FillNoiseArray(scale, width, height, points, colors, alpha, beta, n):** this is the function you want to use most of the time.
 
-thinBasic forums: http://www.thinbasic.com/community/forum.php
+more info on the thinBasic forums: http://www.thinbasic.com/community/showthread.php?12760-PerlinNoise&p=93572&viewfull=1#post93572
